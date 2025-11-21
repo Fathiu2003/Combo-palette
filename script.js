@@ -1,7 +1,29 @@
-// --- script.js ---
+// --- script.js (Contextual Color Logic) ---
 
 const cols = document.querySelectorAll('.color-col');
-        
+const websiteTypeInput = document.getElementById('websiteType');
+
+// 1. Lookup Table for Contextual Themes (The "AI" part)
+// Maps common user input keywords to specific starter colors.
+const colorThemes = {
+    // Keywords for professional/trustworthy/finance themes
+    'finance': ['#1E3A8A', '#065F46', '#10B981'], // Deep Blue, Dark Green, Emerald
+    'tech': ['#3B82F6', '#6366F1', '#14B8A6'], // Blue, Indigo, Teal
+    'startup': ['#3B82F6', '#6366F1', '#14B8A6'],
+    'ecommerce': ['#FBBF24', '#EF4444', '#9333EA'], // Amber, Red, Violet
+    'retail': ['#FBBF24', '#EF4444', '#9333EA'],
+    // Keywords for active/health/nature themes
+    'fitness': ['#EF4444', '#10B981', '#F59E0B'], // Red, Emerald, Amber
+    'health': ['#065F46', '#10B981', '#34D399'], // Dark Green, Emerald, Light Green
+    'nature': ['#065F46', '#10B981', '#34D399'],
+    // Keywords for creative/fun themes
+    'gaming': ['#8B5CF6', '#F43F5E', '#14B8A6'], // Violet, Rose, Teal
+    'art': ['#EC4899', '#F97316', '#6D28D9'], // Pink, Orange, Deep Violet
+};
+
+
+// 2. Core Generation Functions
+
 function generateRandomColor() {
     const hexCodes = '0123456789ABCDEF';
     let color = '#';
@@ -11,12 +33,63 @@ function generateRandomColor() {
     return color;
 }
 
+function getThemeStarterColor(websiteType) {
+    const type = websiteType.toLowerCase().trim();
+    
+    // Check if the input contains any of our defined keywords
+    for (const keyword in colorThemes) {
+        if (type.includes(keyword)) {
+            // Pick a random color from the matched theme's list
+            const themeList = colorThemes[keyword];
+            return themeList[Math.floor(Math.random() * themeList.length)];
+        }
+    }
+    
+    // If no match is found, return null
+    return null;
+}
+
+
+// 3. Main Update Function
+
+function generateColors() {
+    const websiteType = websiteTypeInput.value;
+    const starterColor = getThemeStarterColor(websiteType);
+    
+    cols.forEach((col, index) => {
+        
+        // Skip locked columns
+        if (col.dataset.locked === 'true') {
+            return;
+        }
+
+        let newColor;
+
+        // Apply theme color to the first or second slot for impact
+        if (index === 0 && starterColor) {
+            newColor = starterColor;
+        } else {
+            // Generate a random color for the rest of the palette (or if no theme match)
+            newColor = generateRandomColor();
+        }
+
+        const hexText = col.querySelector('h2');
+
+        col.style.background = newColor;
+        hexText.innerText = newColor;
+        
+        // Ensure readability
+        setTextColor(col, newColor);
+    });
+}
+
+// 4. Auxiliary Functions (Contrast & UX)
+
 function setTextColor(col, hexColor) {
+    // Luminance calculation
     const r = parseInt(hexColor.substring(1, 3), 16);
     const g = parseInt(hexColor.substring(3, 5), 16);
     const b = parseInt(hexColor.substring(5, 7), 16);
-    
-    // Luminance calculation
     const luminance = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
     
     const text = col.querySelector('h2');
@@ -47,23 +120,9 @@ function copyColor(element) {
         });
 }
 
-function generateColors() {
-    cols.forEach(col => {
-        if (col.dataset.locked === 'true') {
-            return;
-        }
+// 5. Event Listeners (Must be run after the DOM is loaded)
 
-        const hexText = col.querySelector('h2');
-        const randomColor = generateRandomColor();
-
-        col.style.background = randomColor;
-        hexText.innerText = randomColor;
-        
-        setTextColor(col, randomColor);
-    });
-}
-
-// Event listeners (Lock & Copy)
+// Event listeners for Lock & Copy
 cols.forEach(col => {
     const lockBtn = col.querySelector('.lock-btn');
     
