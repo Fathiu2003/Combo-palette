@@ -11,9 +11,7 @@
     <header>
         <h1>ComboPalette.dev 🎨</h1>
         <nav>
-            <a href="index.html">Home</a>
-            <a href="generator.html">Generator</a>
-            <a href="#">About</a>
+            <a href="index.html">← Back to Home</a>
         </nav>
     </header>
 
@@ -41,8 +39,13 @@
     </div>
 
     <div class="panel">
-        <button class="generate-btn" onclick="generateColors()">Generate Best Combo 🚀</button>
-        <p class="instruction">Click a color code to copy it. Press SPACE to generate new colors.</p>
+        <div class="control-group">
+            <label for="websiteType">Website Type:</label>
+            <input type="text" id="websiteType" placeholder="e.g., Finance, Gaming, E-commerce">
+        </div>
+
+        <button class="generate-btn" onclick="generateColors()">Regenerate Palette 🚀</button>
+        <p class="instruction">Press SPACE to regenerate, and click a color to copy the Hex code.</p>
     </div>
 
     <div class="copy-popup">Color Copied to Clipboard!</div>
